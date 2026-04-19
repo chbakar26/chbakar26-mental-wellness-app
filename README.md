@@ -7,8 +7,9 @@
 2. From repository root:
    ```bash
    dotnet restore MentalWellnessApp.slnx
-   dotnet ef database update --project /home/runner/work/chbakar26-mental-wellness-app/chbakar26-mental-wellness-app/MentalWellnessApp.Web/MentalWellnessApp.Web.csproj
-   dotnet run --project /home/runner/work/chbakar26-mental-wellness-app/chbakar26-mental-wellness-app/MentalWellnessApp.Web/MentalWellnessApp.Web.csproj
+   dotnet tool restore
+   dotnet tool run dotnet-ef database update --project MentalWellnessApp.Web/MentalWellnessApp.Web.csproj --startup-project MentalWellnessApp.Web/MentalWellnessApp.Web.csproj
+   dotnet run --project MentalWellnessApp.Web/MentalWellnessApp.Web.csproj
    ```
 
 ### Seeded users

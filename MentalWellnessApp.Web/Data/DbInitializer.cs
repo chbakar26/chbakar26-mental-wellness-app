@@ -63,7 +63,7 @@ public static class DbInitializer
             return user;
         }
 
-        var admin = await EnsureUserAsync("admin@wellness.local", "System Admin", "Admin", "Admin123!");
+        await EnsureUserAsync("admin@wellness.local", "System Admin", "Admin", "Admin123!");
         var counsellor = await EnsureUserAsync("counsellor@wellness.local", "Sample Counsellor", "Counsellor", "Counsellor123!");
         var participant = await EnsureUserAsync("participant@wellness.local", "Sample Participant", "Participant", "Participant123!");
 
@@ -118,7 +118,5 @@ public static class DbInitializer
 
             await context.SaveChangesAsync();
         }
-
-        _ = admin;
     }
 }
