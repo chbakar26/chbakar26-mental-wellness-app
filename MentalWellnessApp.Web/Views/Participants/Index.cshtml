@@ -1,0 +1,43 @@
+@model ApplicationUser
+@{
+    ViewData["Title"] = "Participant Hub";
+    var counsellors = (List<ApplicationUser>)ViewBag.Counsellors;
+    var requests = (List<SessionRequest>)ViewBag.MyRequests;
+}
+
+<h2>Participant Hub</h2>
+
+<form asp-action="SelectCounsellor" method="post" class="mb-3">
+    <label class="form-label">Preferred Counsellor</label>
+    <div class="input-group">
+        <select class="form-select" name="counsellorId" required>
+            <option value="">Select counsellor</option>
+            @foreach (var c in counsellors)
+            {
+                <option selected="@(Model.PreferredCounsellorId == c.Id)" value="@c.Id">@c.FullName (@c.Email)</option>
+            }
+        </select>
+        <button class="btn btn-outline-primary" type="submit">Save</button>
+    </div>
+</form>
+
+<div class="mb-3">
+    <a class="btn btn-primary" asp-action="MoodCheckIns">Mood Check-ins</a>
+    <a class="btn btn-outline-primary" asp-action="RequestSession">Request Session</a>
+</div>
+
+<h4>My Session Requests</h4>
+<table class="table table-sm table-striped">
+    <thead><tr><th>Preferred Time</th><th>Counsellor</th><th>Status</th><th>Response</th></tr></thead>
+    <tbody>
+    @foreach (var request in requests)
+    {
+        <tr>
+            <td>@request.PreferredDateTime.ToString("g")</td>
+            <td>@request.Counsellor?.FullName</td>
+            <td>@request.Status</td>
+            <td>@request.CounsellorResponse</td>
+        </tr>
+    }
+    </tbody>
+</table>

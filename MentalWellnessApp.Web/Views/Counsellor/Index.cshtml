@@ -1,0 +1,68 @@
+@{
+    ViewData["Title"] = "Counsellor Hub";
+    var requests = (List<SessionRequest>)ViewBag.Requests;
+    var participants = (List<ApplicationUser>)ViewBag.AssignedParticipants;
+    var checkIns = (List<MoodCheckIn>)ViewBag.MoodCheckIns;
+}
+
+<h2>Counsellor Hub</h2>
+
+<div class="mb-3">
+    <a class="btn btn-primary" asp-controller="Programs" asp-action="Create">Create Program</a>
+    <a class="btn btn-outline-primary" asp-controller="Programs" asp-action="Index">Manage Programs/Sessions/Resources</a>
+</div>
+
+<h4>Session Requests</h4>
+<table class="table table-sm table-striped">
+    <thead><tr><th>Participant</th><th>Preferred Time</th><th>Notes</th><th>Status</th><th>Respond</th></tr></thead>
+    <tbody>
+    @foreach (var r in requests)
+    {
+        <tr>
+            <td>@r.Participant?.FullName</td>
+            <td>@r.PreferredDateTime.ToString("g")</td>
+            <td>@r.ParticipantNotes</td>
+            <td>@r.Status</td>
+            <td>
+                @if (r.Status == SessionRequestStatus.Pending)
+                {
+                    <form asp-action="RespondToRequest" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@r.Id" />
+                        <input type="text" name="counsellorResponse" placeholder="Session details/notes" class="form-control d-inline w-auto" />
+                        <button class="btn btn-sm btn-success" type="submit" name="approve" value="true">Approve</button>
+                        <button class="btn btn-sm btn-warning" type="submit" name="approve" value="false">Deny</button>
+                    </form>
+                }
+                else
+                {
+                    @r.CounsellorResponse
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h4>Assigned Participants</h4>
+<ul>
+    @foreach (var p in participants)
+    {
+        <li>@p.FullName (@p.Email)</li>
+    }
+</ul>
+
+<h4>Recent Participant Mood Check-ins</h4>
+<table class="table table-sm table-bordered">
+    <thead><tr><th>Participant</th><th>Date</th><th>Mood</th><th>Notes</th></tr></thead>
+    <tbody>
+    @foreach (var c in checkIns)
+    {
+        <tr>
+            <td>@c.Participant?.FullName</td>
+            <td>@c.CreatedAt.ToString("g")</td>
+            <td>@c.MoodScore</td>
+            <td>@c.Notes</td>
+        </tr>
+    }
+    </tbody>
+</table>

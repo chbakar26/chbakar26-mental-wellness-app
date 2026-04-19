@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<h2>Welcome, @ViewBag.FullName</h2>
+
+<div class="list-group">
+    <a class="list-group-item list-group-item-action" asp-controller="Programs" asp-action="Index">Programs listing</a>
+    @if (User.IsInRole("Participant"))
+    {
+        <a class="list-group-item list-group-item-action" asp-controller="Participants" asp-action="Index">Participant tools</a>
+    }
+    @if (User.IsInRole("Counsellor"))
+    {
+        <a class="list-group-item list-group-item-action" asp-controller="Programs" asp-action="Create">Create wellness program</a>
+        <a class="list-group-item list-group-item-action" asp-controller="Counsellor" asp-action="Index">Counsellor requests/mood board</a>
+    }
+    @if (User.IsInRole("Admin"))
+    {
+        <a class="list-group-item list-group-item-action" asp-controller="Admin" asp-action="Index">Admin control center</a>
+    }
+</div>
