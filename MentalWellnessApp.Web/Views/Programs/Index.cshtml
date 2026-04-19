@@ -1,0 +1,63 @@
+@model ProgramIndexViewModel
+@{
+    ViewData["Title"] = "Programs";
+}
+
+<h2>Wellness Programs</h2>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3"><input class="form-control" name="topic" value="@Model.TopicFilter" placeholder="Topic" /></div>
+    <div class="col-md-3"><input class="form-control" name="accessibilityLevel" value="@Model.AccessibilityLevelFilter" placeholder="Accessibility level" /></div>
+    <div class="col-md-2"><input class="form-control" type="date" name="startFrom" value="@Model.StartFrom?.ToString("yyyy-MM-dd")" /></div>
+    <div class="col-md-2"><input class="form-control" type="date" name="endTo" value="@Model.EndTo?.ToString("yyyy-MM-dd")" /></div>
+    <div class="col-md-2"><button type="submit" class="btn btn-outline-primary w-100">Search</button></div>
+</form>
+
+<div class="alert alert-secondary">Aggregated average mood trend: <strong>@Model.AverageMoodScore</strong> / 10</div>
+
+@if (User.IsInRole("Counsellor"))
+{
+    <a class="btn btn-primary mb-2" asp-action="Create">Create Program</a>
+}
+
+<table class="table table-bordered">
+    <thead>
+    <tr><th>Topic</th><th>Counsellor</th><th>Dates</th><th>Accessibility</th><th>Compliance</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model.Programs)
+    {
+        <tr>
+            <td>@p.Topic</td>
+            <td>@p.Counsellor?.FullName</td>
+            <td>@p.StartDate.ToShortDateString() - @p.EndDate.ToShortDateString()</td>
+            <td>@p.AccessibilityLevel</td>
+            <td>@p.ApprovalStatus</td>
+            <td>
+                <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@p.Id">View</a>
+                @if (User.IsInRole("Counsellor") && User.Identity?.Name == p.Counsellor?.Email)
+                {
+                    <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@p.Id">Edit</a>
+                    <form asp-action="Delete" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@p.Id" />
+                        <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                    </form>
+                }
+                @if (User.IsInRole("Admin") && p.ApprovalStatus == ApprovalStatus.Pending)
+                {
+                    <form asp-action="ApproveProgram" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@p.Id" />
+                        <input type="hidden" name="approved" value="true" />
+                        <button class="btn btn-sm btn-success" type="submit">Approve</button>
+                    </form>
+                    <form asp-action="ApproveProgram" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@p.Id" />
+                        <input type="hidden" name="approved" value="false" />
+                        <button class="btn btn-sm btn-warning" type="submit">Disapprove</button>
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -1,0 +1,14 @@
+@model RegisterRoleViewModel
+@{
+    ViewData["Title"] = "Counsellor Registration";
+}
+<h2>Counsellor Registration</h2>
+<form asp-action="RegisterCounsellor" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-2"><label asp-for="FullName"></label><input asp-for="FullName" class="form-control" /></div>
+    <div class="mb-2"><label asp-for="Email"></label><input asp-for="Email" class="form-control" /></div>
+    <div class="mb-2"><label asp-for="Password"></label><input asp-for="Password" class="form-control" /></div>
+    <div class="mb-2"><label asp-for="ConfirmPassword"></label><input asp-for="ConfirmPassword" class="form-control" /></div>
+    <button class="btn btn-primary" type="submit">Create Counsellor Account</button>
+</form>
+<partial name="_ValidationScriptsPartial" />

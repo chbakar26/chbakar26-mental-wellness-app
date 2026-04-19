@@ -1,0 +1,121 @@
+@model WellnessProgram
+@{
+    ViewData["Title"] = "Program Details";
+}
+
+<h2>@Model.Topic</h2>
+<p><strong>Counsellor:</strong> @Model.Counsellor?.FullName</p>
+<p>@Model.Description</p>
+<p><strong>Dates:</strong> @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</p>
+<p><strong>Accessibility:</strong> @Model.AccessibilityLevel</p>
+<p><strong>Compliance Status:</strong> @Model.ApprovalStatus</p>
+
+<h4>Sessions</h4>
+<table class="table table-sm table-bordered">
+    <thead><tr><th>Topic</th><th>Schedule</th><th>Meet</th><th>Status</th><th>Compliance</th><th>Actions</th></tr></thead>
+    <tbody>
+    @foreach (var s in Model.Sessions.OrderBy(x => x.ScheduledAt))
+    {
+        <tr>
+            <td>@s.Topic</td>
+            <td>@s.ScheduledAt.ToString("g")</td>
+            <td><a href="@s.GoogleMeetLink" target="_blank">Join Link</a></td>
+            <td>@s.LifecycleStatus @(string.IsNullOrWhiteSpace(s.ParticipantId) ? "" : "(Booked)")</td>
+            <td>@s.ApprovalStatus</td>
+            <td>
+                @if (User.IsInRole("Participant") && s.ApprovalStatus == ApprovalStatus.Approved && s.LifecycleStatus == SessionLifecycleStatus.Open && string.IsNullOrEmpty(s.ParticipantId))
+                {
+                    <form asp-action="BookSession" method="post" class="d-inline">
+                        <input type="hidden" name="sessionId" value="@s.Id" />
+                        <button class="btn btn-sm btn-primary" type="submit">Book</button>
+                    </form>
+                }
+                @if (User.IsInRole("Counsellor") && User.Identity?.Name == Model.Counsellor?.Email)
+                {
+                    <form asp-action="UpdateSessionLifecycle" method="post" class="d-inline">
+                        <input type="hidden" name="sessionId" value="@s.Id" />
+                        <input type="hidden" name="status" value="Completed" />
+                        <button class="btn btn-sm btn-success" type="submit">Mark Completed</button>
+                    </form>
+                    <form asp-action="UpdateSessionLifecycle" method="post" class="d-inline">
+                        <input type="hidden" name="sessionId" value="@s.Id" />
+                        <input type="hidden" name="status" value="Archived" />
+                        <button class="btn btn-sm btn-secondary" type="submit">Archive</button>
+                    </form>
+                }
+                @if (User.IsInRole("Admin") && s.ApprovalStatus == ApprovalStatus.Pending)
+                {
+                    <form asp-action="ApproveSession" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@s.Id" />
+                        <input type="hidden" name="approved" value="true" />
+                        <button class="btn btn-sm btn-success" type="submit">Approve</button>
+                    </form>
+                    <form asp-action="ApproveSession" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@s.Id" />
+                        <input type="hidden" name="approved" value="false" />
+                        <button class="btn btn-sm btn-warning" type="submit">Disapprove</button>
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@if (User.IsInRole("Counsellor") && User.Identity?.Name == Model.Counsellor?.Email)
+{
+    <h5>Add Session</h5>
+    <form asp-action="AddSession" method="post" class="row g-2 mb-3">
+        <input type="hidden" name="programId" value="@Model.Id" />
+        <div class="col-md-3"><input class="form-control" name="topic" placeholder="Topic" required /></div>
+        <div class="col-md-3"><input class="form-control" name="description" placeholder="Description" /></div>
+        <div class="col-md-2"><input class="form-control" type="datetime-local" name="scheduledAt" required /></div>
+        <div class="col-md-3"><input class="form-control" name="googleMeetLink" placeholder="Google Meet link" required /></div>
+        <div class="col-md-1"><button class="btn btn-primary w-100" type="submit">Add</button></div>
+    </form>
+}
+
+<h4>Resources</h4>
+<table class="table table-sm table-striped">
+    <thead><tr><th>Title</th><th>Description</th><th>Social Share</th><th>Compliance</th><th>Actions</th></tr></thead>
+    <tbody>
+    @foreach (var r in Model.Resources)
+    {
+        <tr>
+            <td><a href="@r.Url" target="_blank">@r.Title</a></td>
+            <td>@r.Description</td>
+            <td>
+                <a target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url=@Uri.EscapeDataString(r.Url)">Share</a>
+            </td>
+            <td>@r.ApprovalStatus</td>
+            <td>
+                @if (User.IsInRole("Admin") && r.ApprovalStatus == ApprovalStatus.Pending)
+                {
+                    <form asp-action="ApproveResource" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@r.Id" />
+                        <input type="hidden" name="approved" value="true" />
+                        <button class="btn btn-sm btn-success" type="submit">Approve</button>
+                    </form>
+                    <form asp-action="ApproveResource" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@r.Id" />
+                        <input type="hidden" name="approved" value="false" />
+                        <button class="btn btn-sm btn-warning" type="submit">Disapprove</button>
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@if (User.IsInRole("Counsellor") && User.Identity?.Name == Model.Counsellor?.Email)
+{
+    <h5>Add Resource</h5>
+    <form asp-action="AddResource" method="post" class="row g-2 mb-3">
+        <input type="hidden" name="programId" value="@Model.Id" />
+        <div class="col-md-3"><input class="form-control" name="title" placeholder="Resource title" required /></div>
+        <div class="col-md-4"><input class="form-control" name="url" placeholder="https://..." required /></div>
+        <div class="col-md-4"><input class="form-control" name="description" placeholder="Description" /></div>
+        <div class="col-md-1"><button class="btn btn-primary w-100" type="submit">Add</button></div>
+    </form>
+}

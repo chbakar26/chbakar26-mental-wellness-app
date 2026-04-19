@@ -1,0 +1,27 @@
+@model List<MoodCheckIn>
+@{
+    ViewData["Title"] = "Mood Check-ins";
+}
+<h2>Mood Check-ins</h2>
+
+<form asp-action="AddMoodCheckIn" method="post" class="mb-3">
+    <div class="row g-2">
+        <div class="col-md-2"><input type="number" min="1" max="10" name="moodScore" class="form-control" placeholder="Mood 1-10" required /></div>
+        <div class="col-md-8"><input type="text" name="notes" class="form-control" placeholder="Notes" /></div>
+        <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Submit</button></div>
+    </div>
+</form>
+
+<table class="table table-bordered table-sm">
+    <thead><tr><th>Date</th><th>Score</th><th>Notes</th></tr></thead>
+    <tbody>
+    @foreach (var checkIn in Model)
+    {
+        <tr>
+            <td>@checkIn.CreatedAt.ToString("g")</td>
+            <td>@checkIn.MoodScore</td>
+            <td>@checkIn.Notes</td>
+        </tr>
+    }
+    </tbody>
+</table>

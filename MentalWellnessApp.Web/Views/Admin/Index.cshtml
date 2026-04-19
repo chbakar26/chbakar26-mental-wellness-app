@@ -1,0 +1,49 @@
+@{
+    ViewData["Title"] = "Admin Control Center";
+    var users = (List<ApplicationUser>)ViewBag.Users;
+    var pendingPrograms = (List<WellnessProgram>)ViewBag.PendingPrograms;
+    var pendingSessions = (List<WellnessSession>)ViewBag.PendingSessions;
+    var pendingResources = (List<WellnessResource>)ViewBag.PendingResources;
+}
+
+<h2>Admin Control Center</h2>
+
+<h4>Users (status + role permissions)</h4>
+<table class="table table-sm table-striped">
+    <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Set Role</th><th>Actions</th></tr></thead>
+    <tbody>
+    @foreach (var u in users)
+    {
+        <tr>
+            <td>@u.FullName</td>
+            <td>@u.Email</td>
+            <td>@(u.IsActive ? "Active" : "Disabled")</td>
+            <td>
+                <form asp-action="SetRole" method="post" class="d-flex gap-2">
+                    <input type="hidden" name="userId" value="@u.Id" />
+                    <select name="role" class="form-select form-select-sm">
+                        <option>Participant</option>
+                        <option>Counsellor</option>
+                        <option>Admin</option>
+                    </select>
+                    <button class="btn btn-sm btn-outline-primary" type="submit">Apply</button>
+                </form>
+            </td>
+            <td>
+                <form asp-action="ToggleActive" method="post" class="d-inline">
+                    <input type="hidden" name="userId" value="@u.Id" />
+                    <button class="btn btn-sm btn-outline-warning" type="submit">Toggle Active</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h4>Pending Compliance Queue</h4>
+<ul>
+    <li>Programs pending: @pendingPrograms.Count</li>
+    <li>Sessions pending: @pendingSessions.Count</li>
+    <li>Resources pending: @pendingResources.Count</li>
+</ul>
+<p>Use program details pages and listings to approve/disapprove submitted content.</p>

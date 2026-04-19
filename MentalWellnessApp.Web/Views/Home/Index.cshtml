@@ -1,0 +1,29 @@
+@model ProgramIndexViewModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="text-center mb-4">
+    <h1 class="display-5">Mental Wellness Platform</h1>
+    <p>Public wellness programs, counsellor-led sessions, and participant support tools.</p>
+</div>
+
+<div class="alert alert-info">Average mood trend score: <strong>@Model.AverageMoodScore</strong> / 10</div>
+
+<h3>Featured Approved Programs</h3>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Topic</th><th>Dates</th><th>Accessibility</th><th></th></tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model.Programs)
+    {
+        <tr>
+            <td>@p.Topic</td>
+            <td>@p.StartDate.ToShortDateString() - @p.EndDate.ToShortDateString()</td>
+            <td>@p.AccessibilityLevel</td>
+            <td><a class="btn btn-sm btn-outline-primary" asp-controller="Programs" asp-action="Details" asp-route-id="@p.Id">View</a></td>
+        </tr>
+    }
+    </tbody>
+</table>
